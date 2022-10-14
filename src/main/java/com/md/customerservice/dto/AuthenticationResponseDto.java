@@ -9,4 +9,5 @@ public class AuthenticationResponseDto {
     private String message;
     private String token;
     private Boolean isSuccess;
+    private CustomerDto customer;
 }
