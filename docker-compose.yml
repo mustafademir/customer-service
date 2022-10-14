@@ -1,0 +1,38 @@
+version: '3.5'
+services:
+  mysqldb:
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=customer_db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=123456
+      - MYSQL_ROOT_PASSWORD=123456
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    volumes:
+      - db:/var/lib/mysql
+
+  customer-service:
+    depends_on:
+      - mysqldb
+    image: services/customer-service
+    container_name: customer-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+            "spring.datasource.url"  : "jdbc:mysql://mysqldb:3306/customer_db?useSSL=false",
+            "spring.datasource.username" : "root",
+            "spring.datasource.password" : "123456",
+            "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5InnoDBDialect",
+            "spring.jpa.hibernate.ddl-auto" : "update"
+          }'
+
+volumes:
+  db:
